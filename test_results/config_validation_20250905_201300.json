@@ -1,0 +1,50 @@
+{
+    "System Information": {
+        "success": false,
+        "stdout": "",
+        "stderr": "'uname' is not recognized as an internal or external command,\noperable program or batch file.\n",
+        "returncode": 1
+    },
+    "CPU Information": {
+        "success": false,
+        "stdout": "",
+        "stderr": "'lscpu' is not recognized as an internal or external command,\noperable program or batch file.\n",
+        "returncode": 1
+    },
+    "Memory Information": {
+        "success": false,
+        "stdout": "",
+        "stderr": "'free' is not recognized as an internal or external command,\noperable program or batch file.\n",
+        "returncode": 1
+    },
+    "Disk Information": {
+        "success": false,
+        "stdout": "",
+        "stderr": "'df' is not recognized as an internal or external command,\noperable program or batch file.\n",
+        "returncode": 1
+    },
+    "Network Interfaces": {
+        "success": false,
+        "stdout": "",
+        "stderr": "'ip' is not recognized as an internal or external command,\noperable program or batch file.\n",
+        "returncode": 1
+    },
+    "Running Services": {
+        "success": false,
+        "stdout": "",
+        "stderr": "'systemctl' is not recognized as an internal or external command,\noperable program or batch file.\n",
+        "returncode": 1
+    },
+    "Open Ports": {
+        "success": false,
+        "stdout": "",
+        "stderr": "'ss' is not recognized as an internal or external command,\noperable program or batch file.\n",
+        "returncode": 1
+    },
+    "System Load": {
+        "success": false,
+        "stdout": "",
+        "stderr": "'uptime' is not recognized as an internal or external command,\noperable program or batch file.\n",
+        "returncode": 1
+    }
+}

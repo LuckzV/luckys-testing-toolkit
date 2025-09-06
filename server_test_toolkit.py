@@ -375,14 +375,178 @@ class ServerTestToolkit:
     def generate_build_scripts(self):
         """Generate automated build scripts"""
         print("\nGenerating build scripts...")
-        print("This feature will create automated build scripts for server setup.")
-        print("Implementation coming soon!")
+        
+        scripts = {
+            "server_setup.sh": """#!/bin/bash
+# Lucky's Testing Toolkit - Server Setup Script
+# Generated on: {timestamp}
+
+set -e
+
+echo "Starting server setup..."
+
+# Update system
+echo "Updating system packages..."
+apt update && apt upgrade -y
+
+# Install essential packages
+echo "Installing essential packages..."
+apt install -y curl wget git vim htop net-tools
+
+# Install development tools
+echo "Installing development tools..."
+apt install -y build-essential python3 python3-pip nodejs npm
+
+# Install monitoring tools
+echo "Installing monitoring tools..."
+apt install -y sysbench iperf3 htop iotop nethogs
+
+# Install security tools
+echo "Installing security tools..."
+apt install -y ufw fail2ban
+
+# Configure firewall
+echo "Configuring firewall..."
+ufw --force enable
+ufw allow ssh
+ufw allow 80
+ufw allow 443
+
+echo "Server setup complete!"
+""",
+            
+            "service_config.sh": """#!/bin/bash
+# Lucky's Testing Toolkit - Service Configuration Script
+
+echo "Configuring system services..."
+
+# Enable and start essential services
+systemctl enable ssh
+systemctl start ssh
+
+systemctl enable fail2ban
+systemctl start fail2ban
+
+# Configure log rotation
+cat > /etc/logrotate.d/toolkit << 'EOF'
+/var/log/toolkit/*.log {
+    daily
+    missingok
+    rotate 7
+    compress
+    notifempty
+    create 644 root root
+}
+EOF
+
+echo "Service configuration complete!"
+""",
+            
+            "network_config.sh": """#!/bin/bash
+# Lucky's Testing Toolkit - Network Configuration Script
+
+echo "Configuring network settings..."
+
+# Backup original network config
+cp /etc/netplan/01-netcfg.yaml /etc/netplan/01-netcfg.yaml.backup
+
+# Create new network configuration
+cat > /etc/netplan/01-netcfg.yaml << 'EOF'
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    eth0:
+      dhcp4: true
+      dhcp6: false
+      optional: true
+EOF
+
+# Apply network configuration
+netplan apply
+
+echo "Network configuration complete!"
+"""
+        }
+        
+        # Generate scripts with timestamp
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        for script_name, script_content in scripts.items():
+            script_path = f"scripts/{script_name}"
+            with open(script_path, 'w') as f:
+                # Only format the first script that has timestamp placeholder
+                if script_name == "server_setup.sh":
+                    f.write(script_content.format(timestamp=timestamp))
+                else:
+                    f.write(script_content)
+            
+            # Make executable
+            os.chmod(script_path, 0o755)
+            print(f"  ✓ Generated: {script_path}")
+        
+        print(f"\nBuild scripts generated successfully!")
+        print("Scripts are ready to run on your target server.")
     
     def install_packages(self):
         """Install required packages"""
         print("\nInstalling packages...")
-        print("This feature will install required packages on the server.")
-        print("Implementation coming soon!")
+        
+        # Define package categories
+        packages = {
+            "Essential Tools": ["curl", "wget", "git", "vim", "htop", "tree", "unzip"],
+            "Development": ["build-essential", "python3", "python3-pip", "nodejs", "npm"],
+            "Monitoring": ["sysbench", "iperf3", "iotop", "nethogs", "ncdu"],
+            "Security": ["ufw", "fail2ban", "nmap", "nmap-common"],
+            "Network": ["net-tools", "dnsutils", "traceroute", "mtr-tiny"],
+            "System": ["htop", "iotop", "lsof", "strace", "tcpdump"]
+        }
+        
+        print("Available package categories:")
+        for i, category in enumerate(packages.keys(), 1):
+            print(f"  {i}. {category}")
+        
+        try:
+            choice = input("\nSelect category to install (1-6) or 'all' for everything: ").strip()
+            
+            if choice.lower() == 'all':
+                # Install all packages
+                all_packages = []
+                for category_packages in packages.values():
+                    all_packages.extend(category_packages)
+                
+                print(f"\nInstalling {len(all_packages)} packages...")
+                self._install_package_list(all_packages)
+                
+            elif choice.isdigit() and 1 <= int(choice) <= len(packages):
+                # Install specific category
+                category_name = list(packages.keys())[int(choice) - 1]
+                category_packages = packages[category_name]
+                
+                print(f"\nInstalling {category_name} packages...")
+                self._install_package_list(category_packages)
+                
+            else:
+                print("Invalid choice. Returning to menu.")
+                return
+                
+        except KeyboardInterrupt:
+            print("\nInstallation cancelled.")
+        except Exception as e:
+            print(f"Error during installation: {e}")
+    
+    def _install_package_list(self, packages):
+        """Install a list of packages"""
+        for package in packages:
+            print(f"  Installing {package}...")
+            result = self.run_command(f"apt install -y {package}", timeout=120)
+            
+            if result["success"]:
+                print(f"    ✓ {package} installed successfully")
+            else:
+                print(f"    ✗ {package} failed to install: {result['stderr']}")
+        
+        print("\nPackage installation complete!")
     
     def configure_services(self):
         """Configure system services"""
@@ -417,14 +581,139 @@ class ServerTestToolkit:
     def network_connectivity_test(self):
         """Test network connectivity"""
         print("\nTesting network connectivity...")
-        print("This feature will test network connections.")
-        print("Implementation coming soon!")
+        
+        # Test targets
+        test_targets = [
+            ("Google DNS", "8.8.8.8"),
+            ("Cloudflare DNS", "1.1.1.1"),
+            ("Google", "google.com"),
+            ("GitHub", "github.com"),
+            ("Local Gateway", "192.168.1.1")
+        ]
+        
+        results = {}
+        
+        for name, target in test_targets:
+            print(f"  Testing {name} ({target})...")
+            
+            # Ping test
+            ping_result = self.run_command(f"ping -c 3 -W 2 {target}", timeout=10)
+            
+            # DNS resolution test
+            dns_result = self.run_command(f"nslookup {target}", timeout=5)
+            
+            # Port connectivity test (if it's an IP)
+            port_result = None
+            if target.replace('.', '').isdigit():
+                port_result = self.run_command(f"nc -z -v {target} 80 443 22", timeout=5)
+            
+            results[name] = {
+                "target": target,
+                "ping": ping_result["success"],
+                "dns": dns_result["success"],
+                "ports": port_result["success"] if port_result else "N/A",
+                "ping_output": ping_result["stdout"],
+                "dns_output": dns_result["stdout"]
+            }
+            
+            # Display results
+            status = "✓" if ping_result["success"] else "✗"
+            print(f"    {status} Ping: {'OK' if ping_result['success'] else 'FAILED'}")
+            
+            if dns_result["success"]:
+                print(f"    ✓ DNS Resolution: OK")
+            else:
+                print(f"    ✗ DNS Resolution: FAILED")
+        
+        # Test local network
+        print("\n  Testing local network...")
+        local_scan = self.run_command("nmap -sn 192.168.1.0/24", timeout=30)
+        if local_scan["success"]:
+            print("    ✓ Local network scan completed")
+        else:
+            print("    ✗ Local network scan failed")
+        
+        # Save results
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        result_file = f"{self.results_dir}/network_test_{timestamp}.json"
+        with open(result_file, 'w') as f:
+            json.dump(results, f, indent=4)
+        
+        print(f"\nNetwork connectivity test complete. Results saved to: {result_file}")
     
     def security_scan(self):
         """Run security scan"""
         print("\nRunning security scan...")
-        print("This feature will scan for security vulnerabilities.")
-        print("Implementation coming soon!")
+        
+        security_checks = {
+            "Open Ports": "nmap -sS -O localhost",
+            "SSH Configuration": "sshd -T",
+            "Firewall Status": "ufw status verbose",
+            "Failed Login Attempts": "grep 'Failed password' /var/log/auth.log | tail -10",
+            "Sudo Usage": "grep 'sudo:' /var/log/auth.log | tail -5",
+            "System Updates": "apt list --upgradable",
+            "Running Services": "systemctl list-units --type=service --state=running",
+            "File Permissions": "find /etc -type f -perm /o+w 2>/dev/null | head -10",
+            "SUID Files": "find / -perm -4000 2>/dev/null | head -10",
+            "World Writable Files": "find / -type f -perm -002 2>/dev/null | head -10"
+        }
+        
+        results = {}
+        
+        for check_name, command in security_checks.items():
+            print(f"  Running: {check_name}")
+            result = self.run_command(command, timeout=30)
+            
+            results[check_name] = {
+                "command": command,
+                "success": result["success"],
+                "output": result["stdout"],
+                "error": result["stderr"]
+            }
+            
+            if result["success"]:
+                print(f"    ✓ {check_name}: Completed")
+                # Show first few lines of output
+                lines = result["stdout"].split('\n')[:3]
+                for line in lines:
+                    if line.strip():
+                        print(f"      {line.strip()}")
+            else:
+                print(f"    ✗ {check_name}: Failed")
+        
+        # Additional security checks
+        print("\n  Running additional security checks...")
+        
+        # Check for common vulnerabilities
+        vuln_checks = {
+            "Weak Passwords": "grep -E 'password.*[0-9]{1,3}$' /etc/passwd",
+            "Empty Passwords": "awk -F: '($2 == \"\") {print $1}' /etc/shadow",
+            "Root Login": "grep '^PermitRootLogin' /etc/ssh/sshd_config",
+            "Password Auth": "grep '^PasswordAuthentication' /etc/ssh/sshd_config"
+        }
+        
+        for vuln_name, vuln_command in vuln_checks.items():
+            vuln_result = self.run_command(vuln_command, timeout=10)
+            results[f"Vulnerability_{vuln_name}"] = {
+                "command": vuln_command,
+                "success": vuln_result["success"],
+                "output": vuln_result["stdout"],
+                "error": vuln_result["stderr"]
+            }
+            
+            if vuln_result["success"] and vuln_result["stdout"].strip():
+                print(f"    ⚠ {vuln_name}: Potential issue found")
+            else:
+                print(f"    ✓ {vuln_name}: No issues found")
+        
+        # Save results
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        result_file = f"{self.results_dir}/security_scan_{timestamp}.json"
+        with open(result_file, 'w') as f:
+            json.dump(results, f, indent=4)
+        
+        print(f"\nSecurity scan complete. Results saved to: {result_file}")
+        print("Review the results for potential security issues.")
     
     def compatibility_test(self):
         """Run compatibility test"""
@@ -435,8 +724,96 @@ class ServerTestToolkit:
     def real_time_monitor(self):
         """Real-time system monitor"""
         print("\nStarting real-time monitor...")
-        print("This feature will provide real-time system monitoring.")
-        print("Implementation coming soon!")
+        print("Press Ctrl+C to stop monitoring")
+        
+        try:
+            import psutil
+        except ImportError:
+            print("psutil not available. Installing...")
+            result = self.run_command("pip3 install psutil")
+            if not result["success"]:
+                print("Failed to install psutil. Using basic monitoring.")
+                self._basic_monitor()
+                return
+        
+        try:
+            while True:
+                # Clear screen (works on most terminals)
+                os.system('clear' if os.name == 'posix' else 'cls')
+                
+                print("=" * 60)
+                print("LUCKY'S TESTING TOOLKIT - REAL-TIME MONITOR")
+                print("=" * 60)
+                print(f"Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+                print()
+                
+                # CPU Usage
+                cpu_percent = psutil.cpu_percent(interval=1)
+                print(f"CPU Usage: {cpu_percent}%")
+                
+                # Memory Usage
+                memory = psutil.virtual_memory()
+                print(f"Memory Usage: {memory.percent}% ({memory.used // (1024**3)}GB / {memory.total // (1024**3)}GB)")
+                
+                # Disk Usage
+                disk = psutil.disk_usage('/')
+                print(f"Disk Usage: {disk.percent}% ({disk.used // (1024**3)}GB / {disk.total // (1024**3)}GB)")
+                
+                # Load Average
+                load_avg = psutil.getloadavg()
+                print(f"Load Average: {load_avg[0]:.2f}, {load_avg[1]:.2f}, {load_avg[2]:.2f}")
+                
+                # Network I/O
+                net_io = psutil.net_io_counters()
+                print(f"Network: RX {net_io.bytes_recv // (1024**2)}MB, TX {net_io.bytes_sent // (1024**2)}MB")
+                
+                # Running Processes
+                processes = psutil.process_iter(['pid', 'name', 'cpu_percent', 'memory_percent'])
+                print(f"\nTop 5 Processes by CPU:")
+                sorted_procs = sorted(processes, key=lambda x: x.info['cpu_percent'] or 0, reverse=True)[:5]
+                for proc in sorted_procs:
+                    print(f"  {proc.info['name']}: {proc.info['cpu_percent']:.1f}% CPU, {proc.info['memory_percent']:.1f}% RAM")
+                
+                print("\nPress Ctrl+C to stop...")
+                time.sleep(2)
+                
+        except KeyboardInterrupt:
+            print("\n\nMonitoring stopped.")
+        except Exception as e:
+            print(f"\nError during monitoring: {e}")
+    
+    def _basic_monitor(self):
+        """Basic monitoring without psutil"""
+        try:
+            while True:
+                os.system('clear' if os.name == 'posix' else 'cls')
+                
+                print("=" * 60)
+                print("LUCKY'S TESTING TOOLKIT - BASIC MONITOR")
+                print("=" * 60)
+                print(f"Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+                print()
+                
+                # Basic system info
+                uptime_result = self.run_command("uptime")
+                if uptime_result["success"]:
+                    print(f"Uptime: {uptime_result['stdout'].strip()}")
+                
+                # Memory info
+                mem_result = self.run_command("free -h")
+                if mem_result["success"]:
+                    print(f"\nMemory:\n{mem_result['stdout']}")
+                
+                # Disk info
+                disk_result = self.run_command("df -h")
+                if disk_result["success"]:
+                    print(f"\nDisk Usage:\n{disk_result['stdout']}")
+                
+                print("\nPress Ctrl+C to stop...")
+                time.sleep(5)
+                
+        except KeyboardInterrupt:
+            print("\n\nMonitoring stopped.")
     
     def service_availability_check(self):
         """Check service availability"""
@@ -471,8 +848,109 @@ class ServerTestToolkit:
     def generate_test_report(self):
         """Generate test report"""
         print("\nGenerating test report...")
-        print("This feature will generate test reports.")
-        print("Implementation coming soon!")
+        
+        # Find all result files
+        result_files = []
+        if os.path.exists(self.results_dir):
+            for file in os.listdir(self.results_dir):
+                if file.endswith('.json'):
+                    result_files.append(os.path.join(self.results_dir, file))
+        
+        if not result_files:
+            print("No test results found. Run some tests first!")
+            return
+        
+        # Generate comprehensive report
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        report_file = f"{self.results_dir}/comprehensive_report_{timestamp}.html"
+        
+        html_content = f"""
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lucky's Testing Toolkit - Test Report</title>
+    <style>
+        body {{ font-family: Arial, sans-serif; margin: 20px; }}
+        .header {{ background: #2c3e50; color: white; padding: 20px; border-radius: 5px; }}
+        .section {{ margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }}
+        .success {{ color: #27ae60; }}
+        .error {{ color: #e74c3c; }}
+        .warning {{ color: #f39c12; }}
+        pre {{ background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }}
+        .summary {{ background: #ecf0f1; padding: 15px; border-radius: 5px; }}
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Lucky's Testing Toolkit - Test Report</h1>
+        <p>Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
+        <p>Toolkit Version: {self.version}</p>
+    </div>
+    
+    <div class="summary">
+        <h2>Report Summary</h2>
+        <p>Total result files analyzed: {len(result_files)}</p>
+        <p>Report generated from: {self.results_dir}</p>
+    </div>
+"""
+        
+        # Process each result file
+        for result_file in result_files:
+            try:
+                with open(result_file, 'r') as f:
+                    data = json.load(f)
+                
+                filename = os.path.basename(result_file)
+                html_content += f"""
+    <div class="section">
+        <h3>{filename}</h3>
+        <pre>{json.dumps(data, indent=2)}</pre>
+    </div>
+"""
+            except Exception as e:
+                html_content += f"""
+    <div class="section">
+        <h3>{filename} - Error</h3>
+        <p class="error">Failed to process: {str(e)}</p>
+    </div>
+"""
+        
+        html_content += """
+    <div class="section">
+        <h2>End of Report</h2>
+        <p>This report was generated by Lucky's Testing Toolkit.</p>
+    </div>
+</body>
+</html>
+"""
+        
+        # Write HTML report
+        with open(report_file, 'w') as f:
+            f.write(html_content)
+        
+        print(f"✓ Comprehensive test report generated: {report_file}")
+        
+        # Also generate a simple text report
+        text_report_file = f"{self.results_dir}/test_summary_{timestamp}.txt"
+        with open(text_report_file, 'w') as f:
+            f.write(f"Lucky's Testing Toolkit - Test Summary\n")
+            f.write(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+            f.write(f"Version: {self.version}\n")
+            f.write("=" * 50 + "\n\n")
+            
+            for result_file in result_files:
+                f.write(f"File: {os.path.basename(result_file)}\n")
+                f.write("-" * 30 + "\n")
+                try:
+                    with open(result_file, 'r') as rf:
+                        data = json.load(rf)
+                    f.write(json.dumps(data, indent=2))
+                except Exception as e:
+                    f.write(f"Error reading file: {e}")
+                f.write("\n\n")
+        
+        print(f"✓ Text summary generated: {text_report_file}")
+        print(f"\nReports saved to: {self.results_dir}")
     
     def performance_analysis(self):
         """Performance analysis"""
