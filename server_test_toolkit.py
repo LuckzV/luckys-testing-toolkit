@@ -14,6 +14,78 @@ import argparse
 from datetime import datetime
 from pathlib import Path
 
+class Colors:
+    """ANSI color codes for terminal output"""
+    # Basic colors
+    RED = '\033[91m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    BLUE = '\033[94m'
+    MAGENTA = '\033[95m'
+    CYAN = '\033[96m'
+    WHITE = '\033[97m'
+    
+    # Bright colors
+    BRIGHT_RED = '\033[1;91m'
+    BRIGHT_GREEN = '\033[1;92m'
+    BRIGHT_YELLOW = '\033[1;93m'
+    BRIGHT_BLUE = '\033[1;94m'
+    BRIGHT_MAGENTA = '\033[1;95m'
+    BRIGHT_CYAN = '\033[1;96m'
+    BRIGHT_WHITE = '\033[1;97m'
+    
+    # Background colors
+    BG_RED = '\033[101m'
+    BG_GREEN = '\033[102m'
+    BG_YELLOW = '\033[103m'
+    BG_BLUE = '\033[104m'
+    BG_MAGENTA = '\033[105m'
+    BG_CYAN = '\033[106m'
+    
+    # Styles
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+    BLINK = '\033[5m'
+    REVERSE = '\033[7m'
+    
+    # Reset
+    RESET = '\033[0m'
+    
+    @staticmethod
+    def colorize(text, color):
+        """Apply color to text"""
+        return f"{color}{text}{Colors.RESET}"
+    
+    @staticmethod
+    def success(text):
+        """Green text for success messages"""
+        return Colors.colorize(text, Colors.BRIGHT_GREEN)
+    
+    @staticmethod
+    def error(text):
+        """Red text for error messages"""
+        return Colors.colorize(text, Colors.BRIGHT_RED)
+    
+    @staticmethod
+    def warning(text):
+        """Yellow text for warning messages"""
+        return Colors.colorize(text, Colors.BRIGHT_YELLOW)
+    
+    @staticmethod
+    def info(text):
+        """Blue text for info messages"""
+        return Colors.colorize(text, Colors.BRIGHT_BLUE)
+    
+    @staticmethod
+    def header(text):
+        """Cyan text for headers"""
+        return Colors.colorize(text, Colors.BRIGHT_CYAN)
+    
+    @staticmethod
+    def highlight(text):
+        """Magenta text for highlights"""
+        return Colors.colorize(text, Colors.BRIGHT_MAGENTA)
+
 class ServerTestToolkit:
     def __init__(self):
         self.version = "1.0.0"
@@ -115,18 +187,18 @@ class ServerTestToolkit:
     def server_build_tools(self):
         """Server building and configuration tools"""
         while True:
-            print("\n" + "="*50)
-            print("SERVER BUILD TOOLS")
-            print("="*50)
-            print("1. Validate Server Configuration")
-            print("2. Generate Build Scripts")
-            print("3. Install Required Packages")
-            print("4. Configure System Services")
-            print("5. Setup Network Configuration")
-            print("6. Run OS Installation Script")
-            print("7. Back to Main Menu")
+            print("\n" + Colors.GREEN + "="*50 + Colors.RESET)
+            print(Colors.header(Colors.BOLD + "SERVER BUILD TOOLS"))
+            print(Colors.GREEN + "="*50 + Colors.RESET)
+            print(Colors.info("1. Validate Server Configuration"))
+            print(Colors.info("2. Generate Build Scripts"))
+            print(Colors.info("3. Install Required Packages"))
+            print(Colors.info("4. Configure System Services"))
+            print(Colors.info("5. Setup Network Configuration"))
+            print(Colors.info("6. Run OS Installation Script"))
+            print(Colors.error("7. Back to Main Menu"))
             
-            choice = input("\nSelect option (1-7): ").strip()
+            choice = input(Colors.highlight("\nSelect option (1-7): ")).strip()
             
             if choice == "1":
                 self.validate_server_config()
@@ -148,20 +220,20 @@ class ServerTestToolkit:
     def testing_suite(self):
         """Comprehensive testing suite"""
         while True:
-            print("\n" + "="*50)
-            print("TESTING SUITE")
-            print("="*50)
-            print("1. Server Health Check")
-            print("2. Performance Benchmark")
-            print("3. Load Testing")
-            print("4. Stress Testing")
-            print("5. Network Connectivity Test")
-            print("6. Security Scan")
-            print("7. Compatibility Test")
-            print("8. Run Full Test Suite")
-            print("9. Back to Main Menu")
+            print("\n" + Colors.YELLOW + "="*50 + Colors.RESET)
+            print(Colors.header(Colors.BOLD + "TESTING SUITE"))
+            print(Colors.YELLOW + "="*50 + Colors.RESET)
+            print(Colors.info("1. Server Health Check"))
+            print(Colors.info("2. Performance Benchmark"))
+            print(Colors.info("3. Load Testing"))
+            print(Colors.info("4. Stress Testing"))
+            print(Colors.info("5. Network Connectivity Test"))
+            print(Colors.info("6. Security Scan"))
+            print(Colors.info("7. Compatibility Test"))
+            print(Colors.warning("8. Run Full Test Suite"))
+            print(Colors.error("9. Back to Main Menu"))
             
-            choice = input("\nSelect option (1-9): ").strip()
+            choice = input(Colors.highlight("\nSelect option (1-9): ")).strip()
             
             if choice == "1":
                 self.server_health_check()
@@ -187,18 +259,18 @@ class ServerTestToolkit:
     def monitoring_tools(self):
         """Real-time monitoring and alerting"""
         while True:
-            print("\n" + "="*50)
-            print("MONITORING TOOLS")
-            print("="*50)
-            print("1. Real-time System Monitor")
-            print("2. Service Availability Check")
-            print("3. Performance Monitoring")
-            print("4. Log Analysis")
-            print("5. Alert Configuration")
-            print("6. Generate Monitoring Report")
-            print("7. Back to Main Menu")
+            print("\n" + Colors.MAGENTA + "="*50 + Colors.RESET)
+            print(Colors.header(Colors.BOLD + "MONITORING TOOLS"))
+            print(Colors.MAGENTA + "="*50 + Colors.RESET)
+            print(Colors.info("1. Real-time System Monitor"))
+            print(Colors.info("2. Service Availability Check"))
+            print(Colors.info("3. Performance Monitoring"))
+            print(Colors.info("4. Log Analysis"))
+            print(Colors.info("5. Alert Configuration"))
+            print(Colors.info("6. Generate Monitoring Report"))
+            print(Colors.error("7. Back to Main Menu"))
             
-            choice = input("\nSelect option (1-7): ").strip()
+            choice = input(Colors.highlight("\nSelect option (1-7): ")).strip()
             
             if choice == "1":
                 self.real_time_monitor()
@@ -220,18 +292,18 @@ class ServerTestToolkit:
     def reporting_tools(self):
         """Reporting and analytics"""
         while True:
-            print("\n" + "="*50)
-            print("REPORTING TOOLS")
-            print("="*50)
-            print("1. Generate Test Report")
-            print("2. Performance Analysis")
-            print("3. Trend Analysis")
-            print("4. Compliance Report")
-            print("5. Executive Summary")
-            print("6. Export Results")
-            print("7. Back to Main Menu")
+            print("\n" + Colors.BLUE + "="*50 + Colors.RESET)
+            print(Colors.header(Colors.BOLD + "REPORTING TOOLS"))
+            print(Colors.BLUE + "="*50 + Colors.RESET)
+            print(Colors.info("1. Generate Test Report"))
+            print(Colors.info("2. Performance Analysis"))
+            print(Colors.info("3. Trend Analysis"))
+            print(Colors.info("4. Compliance Report"))
+            print(Colors.info("5. Executive Summary"))
+            print(Colors.info("6. Export Results"))
+            print(Colors.error("7. Back to Main Menu"))
             
-            choice = input("\nSelect option (1-7): ").strip()
+            choice = input(Colors.highlight("\nSelect option (1-7): ")).strip()
             
             if choice == "1":
                 self.generate_test_report()
@@ -272,9 +344,9 @@ class ServerTestToolkit:
             results[check_name] = result
             
             if result["success"]:
-                print(f"    ✓ {check_name}: OK")
+                print(f"    {Colors.success('✓')} {check_name}: {Colors.success('OK')}")
             else:
-                print(f"    ✗ {check_name}: FAILED - {result['stderr']}")
+                print(f"    {Colors.error('✗')} {check_name}: {Colors.error('FAILED')} - {result['stderr']}")
         
         # Save results
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -307,8 +379,10 @@ class ServerTestToolkit:
                 "success": result["success"]
             }
             
-            status = "✓" if result["success"] else "✗"
-            print(f"  {status} {check_name}: {result['stdout'].strip()}")
+            if result["success"]:
+                print(f"  {Colors.success('✓')} {check_name}: {Colors.success(result['stdout'].strip())}")
+            else:
+                print(f"  {Colors.error('✗')} {check_name}: {Colors.error(result['stdout'].strip())}")
         
         # Save health check results
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -483,10 +557,10 @@ echo "Network configuration complete!"
             
             # Make executable
             os.chmod(script_path, 0o755)
-            print(f"  ✓ Generated: {script_path}")
+            print(f"  {Colors.success('✓')} Generated: {Colors.highlight(script_path)}")
         
-        print(f"\nBuild scripts generated successfully!")
-        print("Scripts are ready to run on your target server.")
+        print(f"\n{Colors.success('Build scripts generated successfully!')}")
+        print(Colors.info("Scripts are ready to run on your target server."))
     
     def install_packages(self):
         """Install required packages"""
@@ -542,11 +616,11 @@ echo "Network configuration complete!"
             result = self.run_command(f"apt install -y {package}", timeout=120)
             
             if result["success"]:
-                print(f"    ✓ {package} installed successfully")
+                print(f"    {Colors.success('✓')} {package} {Colors.success('installed successfully')}")
             else:
-                print(f"    ✗ {package} failed to install: {result['stderr']}")
+                print(f"    {Colors.error('✗')} {package} {Colors.error('failed to install')}: {result['stderr']}")
         
-        print("\nPackage installation complete!")
+        print(f"\n{Colors.success('Package installation complete!')}")
     
     def configure_services(self):
         """Configure system services"""
@@ -741,9 +815,9 @@ echo "Network configuration complete!"
                 # Clear screen (works on most terminals)
                 os.system('clear' if os.name == 'posix' else 'cls')
                 
-                print("=" * 60)
-                print("LUCKY'S TESTING TOOLKIT - REAL-TIME MONITOR")
-                print("=" * 60)
+                print(Colors.CYAN + "=" * 60 + Colors.RESET)
+                print(Colors.header(Colors.BOLD + "LUCKY'S TESTING TOOLKIT - REAL-TIME MONITOR"))
+                print(Colors.CYAN + "=" * 60 + Colors.RESET)
                 print(f"Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
                 print()
                 
@@ -788,9 +862,9 @@ echo "Network configuration complete!"
             while True:
                 os.system('clear' if os.name == 'posix' else 'cls')
                 
-                print("=" * 60)
-                print("LUCKY'S TESTING TOOLKIT - BASIC MONITOR")
-                print("=" * 60)
+                print(Colors.CYAN + "=" * 60 + Colors.RESET)
+                print(Colors.header(Colors.BOLD + "LUCKY'S TESTING TOOLKIT - BASIC MONITOR"))
+                print(Colors.CYAN + "=" * 60 + Colors.RESET)
                 print(f"Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
                 print()
                 
@@ -1019,18 +1093,18 @@ echo "Network configuration complete!"
     def main_menu(self):
         """Main menu interface"""
         while True:
-            print("\n" + "="*60)
-            print(self.name.upper() + " v" + self.version)
-            print("="*60)
-            print("1. Server Build Tools")
-            print("2. Testing Suite")
-            print("3. Monitoring Tools")
-            print("4. Reporting Tools")
-            print("5. Configuration")
-            print("6. About")
-            print("7. Exit")
+            print("\n" + Colors.CYAN + "="*60 + Colors.RESET)
+            print(Colors.header(Colors.BOLD + self.name.upper() + " v" + self.version))
+            print(Colors.CYAN + "="*60 + Colors.RESET)
+            print(Colors.info("1. Server Build Tools"))
+            print(Colors.info("2. Testing Suite"))
+            print(Colors.info("3. Monitoring Tools"))
+            print(Colors.info("4. Reporting Tools"))
+            print(Colors.info("5. Configuration"))
+            print(Colors.info("6. About"))
+            print(Colors.error("7. Exit"))
             
-            choice = input("\nSelect option (1-7): ").strip()
+            choice = input(Colors.highlight("\nSelect option (1-7): ")).strip()
             
             if choice == "1":
                 self.server_build_tools()
