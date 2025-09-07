@@ -441,7 +441,7 @@ class ServerTestToolkit:
         print("All results saved to the test_results directory")
     
     def generate_build_scripts(self):
-        """Generate automated build scripts"""
+        """Generate build scripts"""
         print("\nGenerating build scripts...")
         
         scripts = {
@@ -631,7 +631,7 @@ echo "Network configuration complete!"
     def run_os_installation(self):
         """Run OS installation script"""
         print("\nRunning OS installation...")
-        print("This feature will run automated OS installation.")
+        print("This feature will run OS installation.")
         print("Implementation coming soon!")
     
     def load_testing(self):
