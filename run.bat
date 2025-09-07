@@ -18,3 +18,5 @@ echo Starting Server Test Engineer Toolkit...
 python server_test_toolkit.py %*
 
 pause
+
+

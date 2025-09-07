@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
-"""
-Server Test Engineer Toolkit
-A comprehensive tool for server building, testing, and monitoring
-"""
+# server testing tool - still working on this
+# TODO: add more tests
 
 import os
 import sys
@@ -15,8 +13,7 @@ from datetime import datetime
 from pathlib import Path
 
 class Colors:
-    """ANSI color codes for terminal output"""
-    # Basic colors
+    # colors for terminal output
     RED = '\033[91m'
     GREEN = '\033[92m'
     YELLOW = '\033[93m'
@@ -25,7 +22,6 @@ class Colors:
     CYAN = '\033[96m'
     WHITE = '\033[97m'
     
-    # Bright colors
     BRIGHT_RED = '\033[1;91m'
     BRIGHT_GREEN = '\033[1;92m'
     BRIGHT_YELLOW = '\033[1;93m'
@@ -34,7 +30,6 @@ class Colors:
     BRIGHT_CYAN = '\033[1;96m'
     BRIGHT_WHITE = '\033[1;97m'
     
-    # Background colors
     BG_RED = '\033[101m'
     BG_GREEN = '\033[102m'
     BG_YELLOW = '\033[103m'
@@ -42,7 +37,6 @@ class Colors:
     BG_MAGENTA = '\033[105m'
     BG_CYAN = '\033[106m'
     
-    # Styles
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
     BLINK = '\033[5m'

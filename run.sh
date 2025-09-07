@@ -31,3 +31,5 @@ fi
 # Run the toolkit
 echo "Starting Server Test Engineer Toolkit..."
 python3 server_test_toolkit.py "$@"
+
+
