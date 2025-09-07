@@ -22,7 +22,7 @@ A comprehensive, portable tool for server building, testing, and monitoring desi
 - **Compatibility Test** - Test hardware/software compatibility
 - **Full Test Suite** - Run all tests in sequence
 
-### 📊 Monitoring Tools
+### Monitoring Tools
 - **Real-time Monitor** - Live system monitoring
 - **Service Availability** - Monitor service uptime
 - **Performance Monitoring** - Track system performance
